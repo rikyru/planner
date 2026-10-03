@@ -1,0 +1,32 @@
+# Sviluppo con hot reload:
+#   docker compose -f docker-compose.yml -f docker-compose.dev.yml up
+# Frontend Vite su :5173, backend su :8000, PostgreSQL su :5432.
+
+services:
+  postgres:
+    ports:
+      - "5432:5432"
+
+  backend:
+    command: sh -c "alembic upgrade head && uvicorn app.main:app --host 0.0.0.0 --port 8000 --reload"
+    volumes:
+      - ./backend:/app
+      - ./data:/data
+    ports:
+      - "8000:8000"
+
+  frontend:
+    build: !reset null
+    image: node:22-alpine
+    working_dir: /app
+    command: sh -c "npm install && npm run dev -- --host 0.0.0.0"
+    environment:
+      VITE_API_PROXY: http://backend:8000
+    volumes:
+      - ./frontend:/app
+      - frontend_node_modules:/app/node_modules
+    ports: !override
+      - "5173:5173"
+
+volumes:
+  frontend_node_modules:
