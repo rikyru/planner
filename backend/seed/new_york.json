@@ -1,0 +1,87 @@
+{
+  "title": "New York",
+  "description": "Una settimana tra Manhattan e Brooklyn: musei, ponti, pizza e skyline. Viaggio demo per valutare timeline e mappa.",
+  "start_date": "2025-05-12",
+  "end_date": "2025-05-18",
+  "kind": "reconstruct",
+  "timezone": "America/New_York",
+  "days": [
+    {
+      "title": "Arrivo e Times Square",
+      "notes": "Volo puntuale, jet lag gestito con una pizza.",
+      "stops": [
+        {"name": "JFK Terminal 4", "lat": 40.6441, "lon": -73.7822, "category": "transport", "actual_arrival": "14:30", "actual_time_precision": "approximate"},
+        {"name": "Hotel a Midtown", "lat": 40.7579, "lon": -73.9890, "category": "hotel", "actual_time_precision": "afternoon", "notes": "Check-in e doccia veloce."},
+        {"name": "Times Square", "lat": 40.7580, "lon": -73.9855, "category": "attraction", "actual_arrival": "19:00", "actual_time_precision": "approximate", "actual_duration_min": 60},
+        {"name": "Joe's Pizza Broadway", "lat": 40.7547, "lon": -73.9870, "category": "food", "actual_time_precision": "evening", "notes": "Slice classico, fila breve."}
+      ],
+      "segments": [["taxi", 60], ["walking", 10], ["walking", 8]]
+    },
+    {
+      "title": "Central Park e il Met",
+      "stops": [
+        {"name": "The Metropolitan Museum of Art", "lat": 40.7794, "lon": -73.9632, "category": "attraction", "actual_arrival": "10:00", "actual_time_precision": "exact", "actual_duration_min": 180, "notes": "Tempio di Dendur e terrazza."},
+        {"name": "Pranzo al food truck", "category": "food", "actual_time_precision": "afternoon", "notes": "Non ricordo dove esattamente: da geolocalizzare."},
+        {"name": "Bethesda Terrace", "lat": 40.7740, "lon": -73.9708, "category": "nature", "actual_time_precision": "afternoon"},
+        {"name": "Strawberry Fields", "lat": 40.7756, "lon": -73.9752, "category": "nature", "actual_time_precision": "afternoon", "actual_duration_min": 30},
+        {"name": "Upper West Side, cena", "lat": 40.7870, "lon": -73.9754, "category": "food", "actual_time_precision": "evening"}
+      ],
+      "segments": [["walking", 10], ["walking", 15], ["walking", 10], ["walking", 20]]
+    },
+    {
+      "title": "Brooklyn",
+      "notes": "La giornata più bella: ponte all'alba e ritorno in traghetto.",
+      "stops": [
+        {"name": "Hotel a Midtown", "lat": 40.7579, "lon": -73.9890, "category": "hotel", "actual_arrival": "09:00", "actual_time_precision": "exact"},
+        {"name": "Brooklyn Bridge", "lat": 40.7061, "lon": -73.9969, "category": "attraction", "actual_arrival": "09:45", "actual_time_precision": "exact", "actual_duration_min": 60, "notes": "Attraversato a piedi verso Brooklyn."},
+        {"name": "DUMBO, Washington Street", "lat": 40.7033, "lon": -73.9894, "category": "attraction", "actual_arrival": "11:30", "actual_time_precision": "approximate", "actual_duration_min": 75},
+        {"name": "Time Out Market", "lat": 40.7034, "lon": -73.9915, "category": "food", "actual_arrival": "13:00", "actual_time_precision": "exact", "actual_duration_min": 60},
+        {"name": "Pier 11 / Wall Street", "lat": 40.7033, "lon": -74.0055, "category": "transport", "actual_time_precision": "afternoon"}
+      ],
+      "segments": [["subway", 35], ["walking", 20], ["walking", 5], ["ferry", 15]]
+    },
+    {
+      "title": "Lower Manhattan e la Statua",
+      "stops": [
+        {"name": "One World Observatory", "lat": 40.7130, "lon": -74.0132, "category": "attraction", "actual_time_precision": "morning", "actual_duration_min": 90},
+        {"name": "9/11 Memorial", "lat": 40.7115, "lon": -74.0134, "category": "attraction", "actual_time_precision": "morning"},
+        {"name": "Charging Bull", "lat": 40.7056, "lon": -74.0134, "category": "attraction", "actual_arrival": "12:30", "actual_time_precision": "approximate"},
+        {"name": "Statue of Liberty", "lat": 40.6892, "lon": -74.0445, "category": "attraction", "actual_time_precision": "afternoon", "actual_duration_min": 150},
+        {"name": "Battery Park", "lat": 40.7033, "lon": -74.0170, "category": "nature", "actual_time_precision": "evening"}
+      ],
+      "segments": [["walking", 5], ["walking", 15], ["ferry", 25], ["ferry", 25]]
+    },
+    {
+      "title": "High Line e Village",
+      "stops": [
+        {"name": "Chelsea Market", "lat": 40.7424, "lon": -74.0061, "category": "food", "actual_arrival": "10:30", "actual_time_precision": "approximate"},
+        {"name": "High Line", "lat": 40.7398, "lon": -74.0080, "category": "nature", "actual_time_precision": "morning", "actual_duration_min": 60},
+        {"name": "The Vessel, Hudson Yards", "lat": 40.7538, "lon": -74.0022, "category": "attraction", "actual_time_precision": "afternoon"},
+        {"name": "Washington Square Park", "lat": 40.7308, "lon": -73.9973, "category": "nature", "actual_time_precision": "afternoon"},
+        {"name": "Comedy Cellar", "lat": 40.7302, "lon": -74.0005, "category": "nightlife", "actual_arrival": "21:00", "actual_time_precision": "exact", "notes": "Prenotato il giorno prima."}
+      ],
+      "segments": [["walking", 5], ["walking", 25], ["subway", 20], ["walking", 10]]
+    },
+    {
+      "title": "Midtown classico",
+      "stops": [
+        {"name": "Empire State Building", "lat": 40.7484, "lon": -73.9857, "category": "attraction", "actual_arrival": "09:30", "actual_time_precision": "exact", "actual_duration_min": 90},
+        {"name": "New York Public Library", "lat": 40.7532, "lon": -73.9822, "category": "attraction", "actual_time_precision": "morning"},
+        {"name": "Grand Central Terminal", "lat": 40.7527, "lon": -73.9772, "category": "transport", "actual_time_precision": "morning"},
+        {"name": "MoMA", "lat": 40.7614, "lon": -73.9776, "category": "attraction", "actual_time_precision": "afternoon", "actual_duration_min": 150},
+        {"name": "Top of the Rock", "lat": 40.7593, "lon": -73.9794, "category": "attraction", "actual_arrival": "19:45", "actual_time_precision": "exact", "notes": "Tramonto sullo skyline."}
+      ],
+      "segments": [["walking", 12], ["walking", 8], ["walking", 15], ["walking", 8]]
+    },
+    {
+      "title": "Ultimo giorno",
+      "stops": [
+        {"name": "Hotel a Midtown", "lat": 40.7579, "lon": -73.9890, "category": "hotel", "actual_time_precision": "morning", "notes": "Check-out, valigie in deposito."},
+        {"name": "Fifth Avenue", "lat": 40.7625, "lon": -73.9740, "category": "shopping", "actual_time_precision": "morning"},
+        {"name": "Katz's Delicatessen", "lat": 40.7223, "lon": -73.9874, "category": "food", "actual_arrival": "13:00", "actual_time_precision": "approximate"},
+        {"name": "JFK Terminal 4", "lat": 40.6441, "lon": -73.7822, "category": "transport", "actual_arrival": "17:30", "actual_time_precision": "exact"}
+      ],
+      "segments": [["walking", 15], ["subway", 25], ["taxi", 55]]
+    }
+  ]
+}

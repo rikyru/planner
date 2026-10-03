@@ -5,7 +5,7 @@ from collections.abc import Awaitable, Callable
 
 from fastapi import FastAPI, Request, Response
 
-from app.api.routes import config, health
+from app.api.routes import config, days, geocode, health, segments, stops, trips
 from app.core.config import get_settings
 from app.core.errors import register_exception_handlers
 from app.core.logging import configure_logging
@@ -45,5 +45,5 @@ async def request_context(
     return response
 
 
-for module in (health, config):
+for module in (health, config, trips, days, stops, segments, geocode):
     app.include_router(module.router, prefix="/api")
