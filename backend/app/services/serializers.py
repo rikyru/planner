@@ -1,10 +1,14 @@
 """Costruzione dei DTO di risposta a partire dai modelli."""
 
-from app.models import Segment, Stop, Trip, TripDay
+import uuid
+
+from app.models import Photo, Segment, Stop, Trip, TripDay
 from app.repositories.trips import TripCounts
+from app.schemas.photos import PhotoOut
 from app.schemas.stops import SegmentOut, StopOut
 from app.schemas.trips import DayOut, TripDetail, TripSummary
 from app.services.geo import lat_lon, line_coords
+from app.services.photos import photo_urls
 
 
 def stop_out(stop: Stop) -> StopOut:
@@ -49,6 +53,32 @@ def day_out(day: TripDay) -> DayOut:
     )
 
 
+def photo_out(photo: Photo) -> PhotoOut:
+    coords = lat_lon(photo.location)
+    return PhotoOut(
+        id=photo.id,
+        trip_id=photo.trip_id,
+        day_id=photo.day_id,
+        stop_id=photo.stop_id,
+        original_filename=photo.original_filename,
+        mime_type=photo.mime_type,
+        width=photo.width,
+        height=photo.height,
+        size_bytes=photo.size_bytes,
+        taken_at=photo.taken_at,
+        taken_at_offset=photo.taken_at_offset,
+        lat=coords[0] if coords else None,
+        lon=coords[1] if coords else None,
+        caption=photo.caption,
+        created_at=photo.created_at,
+        **photo_urls(photo.id),
+    )
+
+
+def cover_url(photo_id: uuid.UUID | None) -> str | None:
+    return photo_urls(photo_id)["display_url"] if photo_id else None
+
+
 def trip_summary(trip: Trip, counts: TripCounts) -> TripSummary:
     return TripSummary(
         id=trip.id,
@@ -59,16 +89,17 @@ def trip_summary(trip: Trip, counts: TripCounts) -> TripSummary:
         kind=trip.kind,
         visibility=trip.visibility,
         timezone=trip.timezone,
-        cover_url=None,
+        cover_photo_id=trip.cover_photo_id,
+        cover_url=cover_url(trip.cover_photo_id or counts.first_photo_id),
         day_count=counts.day_count,
         stop_count=counts.stop_count,
+        photo_count=counts.photo_count,
         updated_at=trip.updated_at,
     )
 
 
-def trip_detail(trip: Trip) -> TripDetail:
-    stop_count = sum(len(d.stops) for d in trip.days)
-    summary = trip_summary(trip, TripCounts(day_count=len(trip.days), stop_count=stop_count))
+def trip_detail(trip: Trip, counts: TripCounts) -> TripDetail:
+    summary = trip_summary(trip, counts)
     return TripDetail(
         **summary.model_dump(),
         share_token=trip.share_token,

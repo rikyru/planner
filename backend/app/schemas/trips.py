@@ -43,6 +43,7 @@ class TripUpdate(ApiModel):
     end_date: date | None = None
     kind: TripKind | None = None
     timezone: str | None = None
+    cover_photo_id: uuid.UUID | None = None
 
     _tz = field_validator("timezone")(_check_timezone)
 
@@ -56,7 +57,11 @@ class TripSummary(ApiModel):
     kind: TripKind
     visibility: Visibility
     timezone: str | None
-    cover_url: str | None = None
+    cover_photo_id: uuid.UUID | None = None
+    cover_url: str | None = Field(
+        default=None, description="Copertina scelta oppure, in mancanza, la prima foto"
+    )
+    photo_count: int = 0
     day_count: int
     stop_count: int
     updated_at: datetime

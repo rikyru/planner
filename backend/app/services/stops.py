@@ -9,10 +9,11 @@ import logging
 import uuid
 from typing import Any
 
+from sqlalchemy import update
 from sqlalchemy.orm import Session
 
 from app.core.errors import Conflict, NotFound
-from app.models import Stop, TripDay, User
+from app.models import Photo, Stop, TripDay, User
 from app.models.enums import StopCategory, TimePrecision
 from app.schemas.stops import MoveStop, ReorderStops, StopCreate, StopUpdate
 from app.services import segments
@@ -149,6 +150,8 @@ def move_stop(
     index = len(target_list) if data.position is None else min(data.position, len(target_list))
     target_list.insert(index, stop)
     _renumber(target, target_list)
+    # Le foto della tappa la seguono nel nuovo giorno.
+    session.execute(update(Photo).where(Photo.stop_id == stop.id).values(day_id=target.id))
     # I segmenti che toccavano la tappa nel giorno di origine vengono eliminati qui.
     segments.rebuild(session, source)
     segments.rebuild(session, target)

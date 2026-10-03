@@ -8,8 +8,9 @@ from sqlalchemy import func, select
 from sqlalchemy.orm import Session
 
 from app.core.errors import Conflict, DomainValidation, NotFound
-from app.models import Stop, Trip, TripDay, User
+from app.models import Photo, Stop, Trip, TripDay, User
 from app.schemas.trips import MAX_TRIP_DAYS, TripCreate, TripUpdate
+from app.services import storage
 
 logger = logging.getLogger(__name__)
 
@@ -63,6 +64,14 @@ def update_trip(
                 raise DomainValidation("Il tipo di viaggio è obbligatorio")
             setattr(trip, name, value)
 
+    if "cover_photo_id" in fields:
+        cover_id = fields["cover_photo_id"]
+        if cover_id is not None:
+            photo = session.get(Photo, cover_id)
+            if photo is None or photo.trip_id != trip.id:
+                raise DomainValidation("La copertina deve essere una foto di questo viaggio")
+        trip.cover_photo_id = cover_id
+
     new_start = fields.get("start_date") or trip.start_date
     new_end = fields.get("end_date") or trip.end_date
     if (new_start, new_end) != (trip.start_date, trip.end_date):
@@ -110,4 +119,6 @@ def delete_trip(session: Session, user: User, trip_id: uuid.UUID) -> None:
     trip = get_trip(session, user, trip_id)
     session.delete(trip)
     session.commit()
+    # Le righe delle foto spariscono in cascata; i file solo dopo il commit riuscito.
+    storage.delete_trip_files(trip_id)
     logger.info("Eliminato viaggio %s", trip_id)

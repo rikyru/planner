@@ -42,6 +42,10 @@ class Trip(UUIDPk, Timestamps, Base):
         _enum(Visibility, "visibility"), nullable=False, default=Visibility.private
     )
     share_token: Mapped[str | None] = mapped_column(String(64), unique=True)
+    # FK circolare con photos: creata dopo la tabella (use_alter).
+    cover_photo_id: Mapped[uuid.UUID | None] = mapped_column(
+        ForeignKey("photos.id", ondelete="SET NULL", use_alter=True)
+    )
 
     days: Mapped[list["TripDay"]] = relationship(
         back_populates="trip",
