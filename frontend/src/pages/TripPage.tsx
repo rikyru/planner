@@ -7,6 +7,7 @@ import { Button } from '@/components/ui/button'
 import { DayList } from '@/features/days/DayList'
 import { dayLines, dayPoints, overviewLines, overviewPoints } from '@/features/map/mapData'
 import { TripMap } from '@/features/map/TripMap'
+import { PhotosView } from '@/features/photos/PhotosView'
 import { Timeline } from '@/features/stops/Timeline'
 import { EditTripDialog } from '@/features/trips/EditTripDialog'
 import { TripOverview } from '@/features/trips/TripOverview'
@@ -16,7 +17,7 @@ import { cn } from '@/lib/utils'
 import type { Day, TripDetail } from '@/types'
 import { formatDateRange } from '@/utils/dates'
 
-export function TripPage() {
+export function TripPage({ view }: { view?: 'photos' }) {
   const { tripId, dayNumber } = useParams()
   const trip = useTrip(tripId)
 
@@ -37,17 +38,24 @@ export function TripPage() {
 
   return (
     <TripViewProvider trip={trip.data}>
-      <TripLayout trip={trip.data} day={day ?? null} />
+      <TripLayout trip={trip.data} day={day ?? null} view={view} />
     </TripViewProvider>
   )
 }
 
-function TripLayout({ trip, day }: { trip: TripDetail; day: Day | null }) {
+function TripLayout({ trip, day, view }: { trip: TripDetail; day: Day | null; view?: 'photos' }) {
   const desktop = useMediaQuery('(min-width: 1024px)')
   const [mobileTab, setMobileTab] = useState<'timeline' | 'map'>('timeline')
   const [editing, setEditing] = useState(false)
 
-  const content = day ? <Timeline key={day.id} trip={trip} day={day} /> : <TripOverview trip={trip} />
+  const content =
+    view === 'photos' ? (
+      <PhotosView trip={trip} />
+    ) : day ? (
+      <Timeline key={day.id} trip={trip} day={day} />
+    ) : (
+      <TripOverview trip={trip} />
+    )
 
   return (
     <div className="flex h-full flex-col">

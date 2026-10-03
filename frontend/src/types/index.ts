@@ -18,3 +18,7 @@ export type TripKind = Schemas['TripKind']
 export type StopCategory = Schemas['StopCategory']
 export type TimePrecision = Schemas['TimePrecision']
 export type TransportMode = Schemas['TransportMode']
+
+export type Photo = Schemas['PhotoOut']
+export type PhotoUpdate = Schemas['PhotoUpdate']
+export type PhotoUploadResult = Schemas['PhotoUploadResult']

@@ -10,5 +10,6 @@ export const router = createBrowserRouter([
   { path: '/trips/new', element: <NewTripPage /> },
   { path: '/trips/:tripId', element: <TripPage /> },
   { path: '/trips/:tripId/day/:dayNumber', element: <TripPage /> },
+  { path: '/trips/:tripId/photos', element: <TripPage view="photos" /> },
   { path: '*', element: <NotFoundPage /> },
 ])

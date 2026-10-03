@@ -3,16 +3,19 @@ import { CSS } from '@dnd-kit/utilities'
 import { GripVertical, MapPinOff, Pencil } from 'lucide-react'
 import { useEffect, useRef } from 'react'
 
+import { PhotoStrip } from '@/features/photos/PhotoGrid'
 import { useTripView } from '@/features/trips/TripViewContext'
 import { displayTime } from '@/features/stops/stopTime'
 import { cn } from '@/lib/utils'
-import type { Stop } from '@/types'
+import type { Photo, Stop } from '@/types'
 import { CATEGORIES } from '@/utils/labels'
 
 interface Props {
   stop: Stop
   number: number
   onEdit: () => void
+  photos?: Photo[]
+  onOpenPhoto?: (index: number) => void
 }
 
 export function SortableStopCard(props: Props) {
@@ -49,6 +52,8 @@ export function StopCard({
   stop,
   number,
   onEdit,
+  photos,
+  onOpenPhoto,
   handle,
   dragging,
 }: Props & { handle?: React.ReactNode; dragging?: boolean }) {
@@ -123,6 +128,11 @@ export function StopCard({
             )}
           </div>
           {stop.notes && <p className="mt-1 line-clamp-2 text-sm text-muted-foreground">{stop.notes}</p>}
+          {photos && photos.length > 0 && onOpenPhoto && (
+            <div className="mt-2" onClick={(e) => e.stopPropagation()}>
+              <PhotoStrip photos={photos} onOpen={onOpenPhoto} />
+            </div>
+          )}
         </div>
       </div>
     </div>

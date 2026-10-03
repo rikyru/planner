@@ -2,6 +2,7 @@ import { Trash } from 'lucide-react'
 import { useState, type FormEvent } from 'react'
 import { toast } from 'sonner'
 
+import { useTripPhotos } from '@/api/photos'
 import { useCreateStop, useDeleteStop, useMoveStop, useUpdateStop } from '@/api/stops'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
@@ -11,6 +12,7 @@ import { Sheet, SheetContent, SheetDescription, SheetHeader, SheetTitle } from '
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
 import { Textarea } from '@/components/ui/textarea'
 import { PlaceSearch, type Place } from '@/features/geocoding/PlaceSearch'
+import { UploadButton } from '@/features/photos/PhotoUploader'
 import { CategoryPicker } from '@/features/stops/CategoryPicker'
 import { primarySide, type Side } from '@/features/stops/stopTime'
 import { TimeField } from '@/features/stops/TimeField'
@@ -235,6 +237,8 @@ function StopForm({ trip, day, stop, onOpenChange }: Props) {
           <Textarea id="stop-notes" rows={3} value={form.notes} onChange={(e) => setForm((f) => ({ ...f, notes: e.target.value }))} />
         </div>
 
+        {stop && <StopPhotos tripId={trip.id} stopId={stop.id} />}
+
         {stop && trip.days.length > 1 && (
           <div className="space-y-2">
             <Label htmlFor="stop-move">Sposta in un altro giorno</Label>
@@ -288,5 +292,23 @@ function StopForm({ trip, day, stop, onOpenChange }: Props) {
         </div>
       </div>
     </form>
+  )
+}
+
+function StopPhotos({ tripId, stopId }: { tripId: string; stopId: string }) {
+  const photos = useTripPhotos(tripId)
+  const count = photos.data?.filter((p) => p.stop_id === stopId).length ?? 0
+  return (
+    <div className="flex items-center justify-between gap-3 rounded-lg border p-3">
+      <div>
+        <p className="text-sm font-medium">Foto</p>
+        <p className="text-xs text-muted-foreground">
+          {count === 0 ? 'Nessuna foto per questa tappa' : `${count} foto, visibili sotto la tappa`}
+        </p>
+      </div>
+      <UploadButton tripId={tripId} target={{ stopId }} size="sm">
+        Aggiungi
+      </UploadButton>
+    </div>
   )
 }

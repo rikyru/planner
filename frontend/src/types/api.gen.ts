@@ -204,6 +204,76 @@ export interface paths {
         patch: operations["update_segment_api_segments__segment_id__patch"];
         trace?: never;
     };
+    "/api/trips/{trip_id}/photos": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** List Photos */
+        get: operations["list_photos_api_trips__trip_id__photos_get"];
+        put?: never;
+        /** Upload Photos */
+        post: operations["upload_photos_api_trips__trip_id__photos_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/trips/{trip_id}/photos/assign-by-date": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Assign By Date */
+        post: operations["assign_by_date_api_trips__trip_id__photos_assign_by_date_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/photos/{photo_id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post?: never;
+        /** Delete Photo */
+        delete: operations["delete_photo_api_photos__photo_id__delete"];
+        options?: never;
+        head?: never;
+        /** Update Photo */
+        patch: operations["update_photo_api_photos__photo_id__patch"];
+        trace?: never;
+    };
+    "/api/photos/{photo_id}/file": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Photo File */
+        get: operations["photo_file_api_photos__photo_id__file_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/geocode/search": {
         parameters: {
             query?: never;
@@ -225,6 +295,23 @@ export interface paths {
 export type webhooks = Record<string, never>;
 export interface components {
     schemas: {
+        /** AssignByDateResult */
+        AssignByDateResult: {
+            /** Assigned */
+            assigned: number;
+        };
+        /** Body_upload_photos_api_trips__trip_id__photos_post */
+        Body_upload_photos_api_trips__trip_id__photos_post: {
+            /**
+             * Files
+             * @description Una o più immagini
+             */
+            files: string[];
+            /** Day Id */
+            day_id?: string | null;
+            /** Stop Id */
+            stop_id?: string | null;
+        };
         /** DayOut */
         DayOut: {
             /**
@@ -274,6 +361,81 @@ export interface components {
             day_id: string;
             /** Position */
             position?: number | null;
+        };
+        /** PhotoOut */
+        PhotoOut: {
+            /**
+             * Id
+             * Format: uuid
+             */
+            id: string;
+            /**
+             * Trip Id
+             * Format: uuid
+             */
+            trip_id: string;
+            /** Day Id */
+            day_id: string | null;
+            /** Stop Id */
+            stop_id: string | null;
+            /** Original Filename */
+            original_filename: string;
+            /** Mime Type */
+            mime_type: string;
+            /** Width */
+            width: number | null;
+            /** Height */
+            height: number | null;
+            /** Size Bytes */
+            size_bytes: number;
+            /**
+             * Taken At
+             * @description Ora locale di scatto (EXIF), senza fuso
+             */
+            taken_at: string | null;
+            /** Taken At Offset */
+            taken_at_offset: string | null;
+            /** Lat */
+            lat: number | null;
+            /** Lon */
+            lon: number | null;
+            /** Caption */
+            caption: string | null;
+            /** Thumb Url */
+            thumb_url: string;
+            /** Display Url */
+            display_url: string;
+            /** Original Url */
+            original_url: string;
+            /**
+             * Created At
+             * Format: date-time
+             */
+            created_at: string;
+        };
+        /**
+         * PhotoUpdate
+         * @description Associazione manuale. Se si indica una tappa, il giorno diventa quello della tappa.
+         */
+        PhotoUpdate: {
+            /** Day Id */
+            day_id?: string | null;
+            /** Stop Id */
+            stop_id?: string | null;
+            /** Caption */
+            caption?: string | null;
+        };
+        /** PhotoUploadResult */
+        PhotoUploadResult: {
+            /** Created */
+            created: components["schemas"]["PhotoOut"][];
+            /**
+             * Duplicates
+             * @description Foto già presenti nel viaggio (stesso file)
+             */
+            duplicates: components["schemas"]["PhotoOut"][];
+            /** Errors */
+            errors: components["schemas"]["UploadError"][];
         };
         /** PlaceOut */
         PlaceOut: {
@@ -535,8 +697,18 @@ export interface components {
             visibility: components["schemas"]["Visibility"];
             /** Timezone */
             timezone: string | null;
-            /** Cover Url */
+            /** Cover Photo Id */
+            cover_photo_id?: string | null;
+            /**
+             * Cover Url
+             * @description Copertina scelta oppure, in mancanza, la prima foto
+             */
             cover_url?: string | null;
+            /**
+             * Photo Count
+             * @default 0
+             */
+            photo_count: number;
             /** Day Count */
             day_count: number;
             /** Stop Count */
@@ -581,8 +753,18 @@ export interface components {
             visibility: components["schemas"]["Visibility"];
             /** Timezone */
             timezone: string | null;
-            /** Cover Url */
+            /** Cover Photo Id */
+            cover_photo_id?: string | null;
+            /**
+             * Cover Url
+             * @description Copertina scelta oppure, in mancanza, la prima foto
+             */
             cover_url?: string | null;
+            /**
+             * Photo Count
+             * @default 0
+             */
+            photo_count: number;
             /** Day Count */
             day_count: number;
             /** Stop Count */
@@ -606,6 +788,17 @@ export interface components {
             kind?: components["schemas"]["TripKind"] | null;
             /** Timezone */
             timezone?: string | null;
+            /** Cover Photo Id */
+            cover_photo_id?: string | null;
+        };
+        /** UploadError */
+        UploadError: {
+            /** Filename */
+            filename: string;
+            /** Code */
+            code: string;
+            /** Message */
+            message: string;
         };
         /** ValidationError */
         ValidationError: {
@@ -620,6 +813,11 @@ export interface components {
             /** Context */
             ctx?: Record<string, never>;
         };
+        /**
+         * Variant
+         * @enum {string}
+         */
+        Variant: "thumb" | "display" | "original";
         /**
          * Visibility
          * @enum {string}
@@ -1087,6 +1285,203 @@ export interface operations {
                 content: {
                     "application/json": components["schemas"]["SegmentOut"];
                 };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    list_photos_api_trips__trip_id__photos_get: {
+        parameters: {
+            query?: {
+                day_id?: string | null;
+                stop_id?: string | null;
+                /** @description Solo foto senza giorno */
+                unassigned?: boolean;
+            };
+            header?: never;
+            path: {
+                trip_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["PhotoOut"][];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    upload_photos_api_trips__trip_id__photos_post: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                trip_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "multipart/form-data": components["schemas"]["Body_upload_photos_api_trips__trip_id__photos_post"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["PhotoUploadResult"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    assign_by_date_api_trips__trip_id__photos_assign_by_date_post: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                trip_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["AssignByDateResult"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    delete_photo_api_photos__photo_id__delete: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                photo_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            204: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    update_photo_api_photos__photo_id__patch: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                photo_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["PhotoUpdate"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["PhotoOut"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    photo_file_api_photos__photo_id__file_get: {
+        parameters: {
+            query?: {
+                size?: components["schemas"]["Variant"];
+            };
+            header?: never;
+            path: {
+                photo_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
             };
             /** @description Validation Error */
             422: {

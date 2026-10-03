@@ -39,6 +39,12 @@ export function TripCard({ trip, onEdit, onDelete, onShare }: Props) {
             <span>
               {trip.stop_count} {trip.stop_count === 1 ? 'tappa' : 'tappe'}
             </span>
+            {trip.photo_count > 0 && (
+              <>
+                <span aria-hidden>·</span>
+                <span>{trip.photo_count} foto</span>
+              </>
+            )}
             {trip.kind === 'reconstruct' && (
               <Badge variant="secondary" className="ml-1">
                 Ricordo

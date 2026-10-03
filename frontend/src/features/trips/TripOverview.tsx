@@ -30,6 +30,14 @@ export function TripOverview({ trip }: { trip: TripDetail }) {
             <dt className="text-muted-foreground">Sulla mappa</dt>
             <dd className="font-serif text-2xl font-semibold">{located}</dd>
           </div>
+          <div>
+            <dt className="text-muted-foreground">Foto</dt>
+            <dd className="font-serif text-2xl font-semibold">
+              <Link to={`/trips/${trip.id}/photos`} className="hover:text-primary">
+                {trip.photo_count}
+              </Link>
+            </dd>
+          </div>
         </dl>
       </header>
 
