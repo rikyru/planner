@@ -1,11 +1,11 @@
 import { Plus } from 'lucide-react'
 import { useState } from 'react'
 import { Link } from 'react-router'
-import { toast } from 'sonner'
 
 import { useTrips } from '@/api/trips'
 import { AppHeader } from '@/components/AppHeader'
 import { Button } from '@/components/ui/button'
+import { ShareDialog } from '@/features/share/ShareDialog'
 import { DeleteTripDialog } from '@/features/trips/DeleteTripDialog'
 import { EditTripDialog } from '@/features/trips/EditTripDialog'
 import { TripCard } from '@/features/trips/TripCard'
@@ -15,6 +15,7 @@ export function HomePage() {
   const trips = useTrips()
   const [editing, setEditing] = useState<TripSummary | null>(null)
   const [deleting, setDeleting] = useState<TripSummary | null>(null)
+  const [sharing, setSharing] = useState<TripSummary | null>(null)
 
   return (
     <div className="min-h-full">
@@ -52,7 +53,7 @@ export function HomePage() {
                 trip={trip}
                 onEdit={() => setEditing(trip)}
                 onDelete={() => setDeleting(trip)}
-                onShare={() => toast.info('La condivisione arriva con la pagina journal (milestone 5).')}
+                onShare={() => setSharing(trip)}
               />
             ))}
           </div>
@@ -61,6 +62,7 @@ export function HomePage() {
 
       <EditTripDialog trip={editing} onOpenChange={(open) => !open && setEditing(null)} />
       <DeleteTripDialog trip={deleting} onOpenChange={(open) => !open && setDeleting(null)} />
+      <ShareDialog trip={sharing} onOpenChange={(open) => !open && setSharing(null)} />
     </div>
   )
 }

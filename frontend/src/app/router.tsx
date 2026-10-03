@@ -1,15 +1,21 @@
 import { createBrowserRouter } from 'react-router'
 
-import { HomePage } from '@/pages/HomePage'
-import { NewTripPage } from '@/pages/NewTripPage'
 import { NotFoundPage } from '@/pages/NotFoundPage'
-import { TripPage } from '@/pages/TripPage'
 
+// Ogni pagina è un chunk separato: chi apre un link condiviso scarica solo il diario e la mappa,
+// non l'editor.
 export const router = createBrowserRouter([
-  { path: '/', element: <HomePage /> },
-  { path: '/trips/new', element: <NewTripPage /> },
-  { path: '/trips/:tripId', element: <TripPage /> },
-  { path: '/trips/:tripId/day/:dayNumber', element: <TripPage /> },
-  { path: '/trips/:tripId/photos', element: <TripPage view="photos" /> },
+  { path: '/', lazy: () => import('@/pages/HomePage').then((m) => ({ Component: m.HomePage })) },
+  { path: '/trips/new', lazy: () => import('@/pages/NewTripPage').then((m) => ({ Component: m.NewTripPage })) },
+  { path: '/trips/:tripId', lazy: () => import('@/pages/TripPage').then((m) => ({ Component: m.TripPage })) },
+  {
+    path: '/trips/:tripId/day/:dayNumber',
+    lazy: () => import('@/pages/TripPage').then((m) => ({ Component: m.TripPage })),
+  },
+  {
+    path: '/trips/:tripId/photos',
+    lazy: () => import('@/pages/TripPage').then((m) => ({ Component: () => <m.TripPage view="photos" /> })),
+  },
+  { path: '/share/:token', lazy: () => import('@/pages/SharePage').then((m) => ({ Component: m.SharePage })) },
   { path: '*', element: <NotFoundPage /> },
 ])

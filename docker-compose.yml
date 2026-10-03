@@ -41,6 +41,8 @@ services:
     restart: unless-stopped
     ports:
       - "${APP_PORT:-8080}:80"
+      # Solo pagine condivise in sola lettura: la porta da esporre su Internet, se serve.
+      - "${SHARE_PORT:-8081}:8081"
     depends_on:
       backend:
         condition: service_healthy

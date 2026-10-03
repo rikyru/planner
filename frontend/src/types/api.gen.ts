@@ -274,6 +274,82 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/trips/{trip_id}/share": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Get Share */
+        get: operations["get_share_api_trips__trip_id__share_get"];
+        put?: never;
+        /**
+         * Enable Share
+         * @description Attiva il link pubblico; se esiste già lo mantiene.
+         */
+        post: operations["enable_share_api_trips__trip_id__share_post"];
+        /** Disable Share */
+        delete: operations["disable_share_api_trips__trip_id__share_delete"];
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/trips/{trip_id}/share/rotate": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Rotate Share
+         * @description Genera un nuovo link: quello precedente smette di funzionare.
+         */
+        post: operations["rotate_share_api_trips__trip_id__share_rotate_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/share/{token}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Shared Trip */
+        get: operations["shared_trip_api_share__token__get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/share/{token}/photos/{photo_id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Shared Photo */
+        get: operations["shared_photo_api_share__token__photos__photo_id__get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/geocode/search": {
         parameters: {
             query?: never;
@@ -515,6 +591,136 @@ export interface components {
             distance_m?: number | null;
             /** Notes */
             notes?: string | null;
+        };
+        /** ShareInfo */
+        ShareInfo: {
+            visibility: components["schemas"]["Visibility"];
+            /** Token */
+            token: string | null;
+            /**
+             * Path
+             * @description Percorso della pagina pubblica, es. /share/{token}
+             */
+            path: string | null;
+            /**
+             * Url
+             * @description URL completo se PUBLIC_BASE_URL è configurato
+             */
+            url: string | null;
+        };
+        /** SharedDay */
+        SharedDay: {
+            /** Day Number */
+            day_number: number;
+            /**
+             * Date
+             * Format: date
+             */
+            date: string;
+            /** Title */
+            title: string | null;
+            /** Notes */
+            notes: string | null;
+            /** Stops */
+            stops: components["schemas"]["SharedStop"][];
+            /** Segments */
+            segments: components["schemas"]["SharedSegment"][];
+            /** Photos */
+            photos: components["schemas"]["SharedPhoto"][];
+        };
+        /** SharedPhoto */
+        SharedPhoto: {
+            /**
+             * Id
+             * Format: uuid
+             */
+            id: string;
+            /** Stop Id */
+            stop_id: string | null;
+            /** Caption */
+            caption: string | null;
+            /** Width */
+            width: number | null;
+            /** Height */
+            height: number | null;
+            /**
+             * Taken Time
+             * @description Ora locale di scatto, senza data né fuso
+             */
+            taken_time: string | null;
+            /** Thumb Url */
+            thumb_url: string;
+            /** Display Url */
+            display_url: string;
+        };
+        /** SharedSegment */
+        SharedSegment: {
+            /**
+             * From Stop Id
+             * Format: uuid
+             */
+            from_stop_id: string;
+            /**
+             * To Stop Id
+             * Format: uuid
+             */
+            to_stop_id: string;
+            transport_mode: components["schemas"]["TransportMode"];
+            /** Duration Min */
+            duration_min: number | null;
+        };
+        /** SharedStop */
+        SharedStop: {
+            /**
+             * Id
+             * Format: uuid
+             */
+            id: string;
+            /** Name */
+            name: string;
+            /** Lat */
+            lat: number | null;
+            /** Lon */
+            lon: number | null;
+            category: components["schemas"]["StopCategory"];
+            /** Custom Category */
+            custom_category: string | null;
+            /**
+             * Time
+             * @description Orario mostrato: effettivo o pianificato secondo il viaggio
+             */
+            time: string | null;
+            time_precision: components["schemas"]["TimePrecision"];
+            /** Duration Min */
+            duration_min: number | null;
+            /** Notes */
+            notes: string | null;
+        };
+        /** SharedTrip */
+        SharedTrip: {
+            /** Title */
+            title: string;
+            /** Description */
+            description: string | null;
+            /**
+             * Start Date
+             * Format: date
+             */
+            start_date: string;
+            /**
+             * End Date
+             * Format: date
+             */
+            end_date: string;
+            kind: components["schemas"]["TripKind"];
+            /** Cover Url */
+            cover_url: string | null;
+            /** Stop Count */
+            stop_count: number;
+            /** Photo Count */
+            photo_count: number;
+            /** Days */
+            days: components["schemas"]["SharedDay"][];
         };
         /**
          * StopCategory
@@ -1470,6 +1676,193 @@ export interface operations {
             };
             header?: never;
             path: {
+                photo_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    get_share_api_trips__trip_id__share_get: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                trip_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ShareInfo"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    enable_share_api_trips__trip_id__share_post: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                trip_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ShareInfo"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    disable_share_api_trips__trip_id__share_delete: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                trip_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ShareInfo"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    rotate_share_api_trips__trip_id__share_rotate_post: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                trip_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ShareInfo"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    shared_trip_api_share__token__get: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                token: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["SharedTrip"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    shared_photo_api_share__token__photos__photo_id__get: {
+        parameters: {
+            query?: {
+                size?: components["schemas"]["Variant"];
+            };
+            header?: never;
+            path: {
+                token: string;
                 photo_id: string;
             };
             cookie?: never;

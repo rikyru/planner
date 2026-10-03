@@ -1,4 +1,4 @@
-import { ArrowLeft, List, Map as MapIcon, Pencil } from 'lucide-react'
+import { ArrowLeft, List, Map as MapIcon, Pencil, Share2 } from 'lucide-react'
 import { useMemo, useState } from 'react'
 import { Link, Navigate, useParams } from 'react-router'
 
@@ -8,6 +8,7 @@ import { DayList } from '@/features/days/DayList'
 import { dayLines, dayPoints, overviewLines, overviewPoints } from '@/features/map/mapData'
 import { TripMap } from '@/features/map/TripMap'
 import { PhotosView } from '@/features/photos/PhotosView'
+import { ShareDialog } from '@/features/share/ShareDialog'
 import { Timeline } from '@/features/stops/Timeline'
 import { EditTripDialog } from '@/features/trips/EditTripDialog'
 import { TripOverview } from '@/features/trips/TripOverview'
@@ -47,6 +48,7 @@ function TripLayout({ trip, day, view }: { trip: TripDetail; day: Day | null; vi
   const desktop = useMediaQuery('(min-width: 1024px)')
   const [mobileTab, setMobileTab] = useState<'timeline' | 'map'>('timeline')
   const [editing, setEditing] = useState(false)
+  const [sharing, setSharing] = useState(false)
 
   const content =
     view === 'photos' ? (
@@ -69,6 +71,9 @@ function TripLayout({ trip, day, view }: { trip: TripDetail; day: Day | null; vi
           <p className="truncate font-serif text-lg leading-tight font-semibold">{trip.title}</p>
           <p className="truncate text-xs text-muted-foreground">{formatDateRange(trip.start_date, trip.end_date)}</p>
         </div>
+        <Button variant="ghost" size="sm" onClick={() => setSharing(true)}>
+          <Share2 /> <span className="hidden sm:inline">{trip.visibility === 'unlisted' ? 'Condiviso' : 'Condividi'}</span>
+        </Button>
         <Button variant="ghost" size="sm" onClick={() => setEditing(true)}>
           <Pencil /> <span className="hidden sm:inline">Modifica</span>
         </Button>
@@ -105,6 +110,7 @@ function TripLayout({ trip, day, view }: { trip: TripDetail; day: Day | null; vi
       )}
 
       <EditTripDialog trip={editing ? trip : null} onOpenChange={setEditing} />
+      <ShareDialog trip={sharing ? trip : null} onOpenChange={setSharing} />
     </div>
   )
 }

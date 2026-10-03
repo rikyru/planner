@@ -16,13 +16,20 @@ docker compose up -d
 L'app è su `http://<server>:8080` (porta `APP_PORT`). Al primo avvio il backend applica le
 migrazioni Alembic.
 
+Viaggio demo (7 giorni a New York, in modalità ricostruzione):
+
+```bash
+docker compose exec backend python -m seed.load            # lo crea se manca
+docker compose exec backend python -m seed.load --replace  # lo ricrea da zero
+```
+
 Servizi:
 
 | Servizio | Ruolo |
 | --- | --- |
 | `postgres` | PostgreSQL 16 + PostGIS, volume `pgdata` |
 | `backend` | FastAPI su `:8000` (solo rete interna), foto in `./data` |
-| `frontend` | nginx: serve la SPA React e fa da proxy per `/api` |
+| `frontend` | nginx: app completa su `APP_PORT` (8080), solo diari condivisi su `SHARE_PORT` (8081) |
 
 ## Sviluppo
 
@@ -57,12 +64,35 @@ Tutto passa da `.env` (vedi `.env.example`); nessuna credenziale è scritta nel 
   `nominatim`. Con Nominatim imposta `GEOCODER_USER_AGENT` con un tuo contatto, come richiesto
   dalla loro policy.
 
+## Foto
+
+- Upload multiplo da timeline, scheda tappa o vista **Foto** (JPEG, HEIC, PNG, WebP; max 60 MB
+  a file). Gli originali restano intatti in `data/photos/<viaggio>/originals/`; il backend genera
+  due varianti WebP ruotate e senza metadati (`thumbs/` 480 px, `display/` 1920 px).
+- Dagli EXIF vengono letti data/ora di scatto e posizione GPS. I doppioni (stesso file nello stesso
+  viaggio) vengono riconosciuti e non duplicati.
+- L'associazione a giorno e tappa è manuale. Il pulsante **Assegna per data di scatto** mette le
+  foto senza giorno nella giornata della loro data, senza toccare quelle già associate.
+- La copertina si sceglie dalla foto aperta; senza scelta si usa la prima foto scattata.
+
+## Condivisione
+
+Da **Condividi** (nella scheda del viaggio o nella pagina del viaggio) si crea un link
+`/share/<token>` con un token casuale non indovinabile. La pagina è un diario in sola lettura:
+giornate, tappe, mappa e foto assegnate a una giornata. Non espone EXIF, coordinate delle foto né
+file originali, e chiede ai motori di ricerca di non indicizzarla. **Nuovo link** invalida quello
+precedente, **Disattiva** lo revoca.
+
 ## Sicurezza e accesso
 
-L'MVP **non ha login**: chiunque raggiunga l'app può modificare i viaggi. Tienila nella rete di
-casa o dietro una VPN (es. Tailscale). Le pagine `/share/<token>` sono pensate per essere
-pubbliche: se vuoi esporle su internet, pubblica dal reverse proxy solo `/share/`, `/assets/` e
-`/api/share/`.
+L'MVP **non ha login**: chiunque raggiunga la porta dell'app (`APP_PORT`) può modificare i
+viaggi. Tienila nella rete di casa o dietro una VPN (es. Tailscale).
+
+Per far vedere un diario a chi è fuori casa, esponi **solo** `SHARE_PORT` (8081), per esempio con
+un reverse proxy, Cloudflare Tunnel o Tailscale Funnel, e imposta `PUBLIC_BASE_URL` con
+l'indirizzo pubblico, così i link copiati puntano lì. Su quella porta esistono solo
+`/share/<token>`, le relative API in sola lettura e i file statici: l'editor e le API di modifica
+rispondono 404.
 
 ## Server: Mac mini 2015
 
@@ -75,10 +105,18 @@ Desktop non supportano più macOS 12 Monterey, l'ultimo disponibile per quel mod
 ## Backup
 
 - Database: `docker compose exec postgres pg_dump -U planner planner > backup.sql`
-- Foto: copia della cartella `./data`
+- Foto: copia della cartella `./data` (originali e varianti; le varianti si rigenerano da sole se
+  mancano)
 
 ## Test
 
 ```bash
 docker compose exec backend pytest
 ```
+
+I test girano su un database `planner_test` creato al volo sullo stesso PostgreSQL (con le
+migrazioni Alembic) e coprono viaggi e giorni, tappe e riordino, foto (EXIF, miniature,
+associazione) e link di condivisione.
+
+Frontend: `cd frontend && npm run typecheck && npm run lint`. Dopo aver cambiato le API,
+`npm run gen:api` rigenera i tipi TypeScript dallo schema OpenAPI del backend in esecuzione.
