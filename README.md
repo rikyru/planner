@@ -16,6 +16,16 @@ docker compose up -d
 L'app è su `http://<server>:8080` (porta `APP_PORT`). Al primo avvio il backend applica le
 migrazioni Alembic.
 
+Su un server con altri container Docker conviene lo script, che tocca solo lo stack `planner`:
+
+```bash
+git clone https://github.com/rikyru/planner && cd planner
+./scripts/deploy.sh         # anche per aggiornare, dopo un git pull
+```
+
+Al primo avvio crea `.env` con una password casuale e porte libere (da 8080 in su), poi costruisce,
+avvia e aspetta che l'app risponda. Si ferma se trova un altro stack Compose chiamato `planner`.
+
 Viaggio demo (7 giorni a New York, in modalità ricostruzione):
 
 ```bash
