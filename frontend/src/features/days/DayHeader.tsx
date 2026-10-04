@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useLayoutEffect, useRef, useState } from 'react'
 
 import { useUpdateDay } from '@/api/trips'
 import { Textarea } from '@/components/ui/textarea'
@@ -12,6 +12,15 @@ export function DayHeader({ tripId, day }: { tripId: string; day: Day }) {
   const [title, setTitle] = useState(day.title ?? '')
   const [notes, setNotes] = useState(day.notes ?? '')
   const [showNotes, setShowNotes] = useState(Boolean(day.notes))
+  const titleRef = useRef<HTMLTextAreaElement>(null)
+
+  // I titoli lunghi vanno a capo: il campo cresce con il testo invece di tagliarlo.
+  useLayoutEffect(() => {
+    const el = titleRef.current
+    if (!el) return
+    el.style.height = 'auto'
+    el.style.height = `${el.scrollHeight}px`
+  }, [title])
 
   function save(body: { title?: string; notes?: string }) {
     update.mutate({ dayId: day.id, body })
@@ -22,15 +31,22 @@ export function DayHeader({ tripId, day }: { tripId: string; day: Day }) {
       <p className="text-xs font-semibold tracking-widest text-primary uppercase">
         Giorno {day.day_number} · {formatDayLong(day.date)}
       </p>
-      <input
+      <textarea
+        ref={titleRef}
+        rows={1}
         aria-label="Titolo della giornata"
-        className="w-full rounded-md bg-transparent font-serif text-2xl font-semibold tracking-tight outline-none placeholder:text-muted-foreground/60 focus:bg-muted/60 sm:text-3xl"
+        className="block w-full resize-none overflow-hidden rounded-md bg-transparent font-serif text-2xl leading-tight font-semibold tracking-tight outline-none placeholder:text-muted-foreground/60 focus:bg-muted/60 sm:text-3xl"
         placeholder="Dai un titolo alla giornata"
         value={title}
         maxLength={200}
-        onChange={(e) => setTitle(e.target.value)}
+        onChange={(e) => setTitle(e.target.value.replace(/\n/g, ' '))}
         onBlur={() => title !== (day.title ?? '') && save({ title })}
-        onKeyDown={(e) => e.key === 'Enter' && e.currentTarget.blur()}
+        onKeyDown={(e) => {
+          if (e.key === 'Enter') {
+            e.preventDefault()
+            e.currentTarget.blur()
+          }
+        }}
       />
       {showNotes ? (
         <Textarea

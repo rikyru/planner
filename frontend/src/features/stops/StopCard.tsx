@@ -98,8 +98,8 @@ export function StopCard({
         </span>
         <div className="min-w-0 flex-1">
           <div className="flex items-start justify-between gap-2">
-            <h3 className="min-w-0 truncate leading-7 font-medium">
-              <button type="button" className="max-w-full truncate text-left outline-none focus-visible:underline" aria-pressed={selected}>
+            <h3 className="line-clamp-2 min-w-0 pt-0.5 leading-6 font-medium">
+              <button type="button" className="text-left outline-none focus-visible:underline" aria-pressed={selected}>
                 {stop.name}
               </button>
             </h3>

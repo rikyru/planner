@@ -1,7 +1,8 @@
-"""Carica il viaggio demo "New York, 7 giorni".
+"""Carica il viaggio demo "New York, 7 giorni" o un altro viaggio nello stesso formato JSON.
 
-Uso:  python -m seed.load            (salta se esiste già un viaggio con lo stesso titolo)
-      python -m seed.load --replace  (lo ricrea)
+Uso:  python -m seed.load                    (salta se esiste già un viaggio con lo stesso titolo)
+      python -m seed.load --replace          (lo ricrea)
+      python -m seed.load mio-viaggio.json   (carica un file nello stesso formato)
 """
 
 import argparse
@@ -31,7 +32,7 @@ def load(data: dict[str, Any], replace: bool = False) -> Trip | None:
             select(Trip).where(Trip.user_id == user.id, Trip.title == data["title"])
         )
         if existing and not replace:
-            logger.info("Il viaggio demo %r esiste già: nessuna modifica", data["title"])
+            logger.info("Il viaggio %r esiste già: nessuna modifica", data["title"])
             return None
         if existing:
             trips.delete_trip(session, user, existing.id)
@@ -65,16 +66,19 @@ def load(data: dict[str, Any], replace: bool = False) -> Trip | None:
                     segment.id,
                     SegmentUpdate(transport_mode=mode, actual_duration_min=minutes),
                 )
-        logger.info("Creato viaggio demo %r (%s)", trip.title, trip.id)
+        logger.info("Creato viaggio %r (%s)", trip.title, trip.id)
         return trip
 
 
 def main() -> None:
     logging.basicConfig(level=logging.INFO, format="%(levelname)s %(message)s")
     parser = argparse.ArgumentParser(description=__doc__)
+    parser.add_argument(
+        "file", nargs="?", type=Path, default=SEED_FILE, help="JSON del viaggio (default: demo)"
+    )
     parser.add_argument("--replace", action="store_true", help="ricrea il viaggio se esiste")
     args = parser.parse_args()
-    load(json.loads(SEED_FILE.read_text(encoding="utf-8")), replace=args.replace)
+    load(json.loads(args.file.read_text(encoding="utf-8")), replace=args.replace)
 
 
 if __name__ == "__main__":

@@ -50,7 +50,7 @@ export function DayList({ trip, orientation }: { trip: TripDetail; orientation: 
             className={({ isActive }) =>
               cn(
                 'group flex shrink-0 items-center gap-3 rounded-lg text-left transition-colors',
-                vertical ? 'px-3 py-2' : 'border px-3 py-1.5',
+                vertical ? 'px-3 py-2' : 'max-w-56 border px-3 py-1.5',
                 isActive ? 'bg-primary text-primary-foreground' : 'hover:bg-muted',
               )
             }
