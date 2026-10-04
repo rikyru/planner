@@ -16,9 +16,10 @@ from sqlalchemy import select
 from app.core.config import get_settings
 from app.db.session import SessionLocal
 from app.models import Trip
+from app.schemas.ideas import IdeaCreate
 from app.schemas.stops import SegmentUpdate, StopCreate
 from app.schemas.trips import DayUpdate, TripCreate
-from app.services import days, segments, stops, trips
+from app.services import days, ideas, segments, stops, trips
 from app.services.users import get_or_create_local_user
 
 logger = logging.getLogger("seed")
@@ -66,6 +67,8 @@ def load(data: dict[str, Any], replace: bool = False) -> Trip | None:
                     segment.id,
                     SegmentUpdate(transport_mode=mode, actual_duration_min=minutes),
                 )
+        for idea_data in data.get("ideas", []):
+            ideas.create_idea(session, user, trip.id, IdeaCreate(**idea_data))
         logger.info("Creato viaggio %r (%s)", trip.title, trip.id)
         return trip
 

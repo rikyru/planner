@@ -55,6 +55,9 @@ _OSM_CATEGORIES: dict[tuple[str, str], StopCategory] = {
     ("railway", "*"): StopCategory.transport,
     ("public_transport", "*"): StopCategory.transport,
     ("aeroway", "*"): StopCategory.transport,
+    ("place", "neighbourhood"): StopCategory.neighborhood,
+    ("place", "quarter"): StopCategory.neighborhood,
+    ("place", "suburb"): StopCategory.neighborhood,
 }
 
 

@@ -23,6 +23,8 @@ class StopCategory(StrEnum):
     nature = "nature"
     shopping = "shopping"
     nightlife = "nightlife"
+    # Quartieri e passeggiate: zone attraversate a piedi più che singoli luoghi.
+    neighborhood = "neighborhood"
     custom = "custom"
 
 

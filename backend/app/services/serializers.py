@@ -2,8 +2,9 @@
 
 import uuid
 
-from app.models import Photo, Segment, Stop, Trip, TripDay
+from app.models import Idea, Photo, Segment, Stop, Trip, TripDay
 from app.repositories.trips import TripCounts
+from app.schemas.ideas import IdeaOut
 from app.schemas.photos import PhotoOut
 from app.schemas.stops import SegmentOut, StopOut
 from app.schemas.trips import DayOut, TripDetail, TripSummary
@@ -72,6 +73,23 @@ def photo_out(photo: Photo) -> PhotoOut:
         caption=photo.caption,
         created_at=photo.created_at,
         **photo_urls(photo.id),
+    )
+
+
+def idea_out(idea: Idea) -> IdeaOut:
+    coords = lat_lon(idea.location)
+    return IdeaOut(
+        id=idea.id,
+        trip_id=idea.trip_id,
+        name=idea.name,
+        lat=coords[0] if coords else None,
+        lon=coords[1] if coords else None,
+        address=idea.address,
+        category=idea.category,
+        custom_category=idea.custom_category,
+        notes=idea.notes,
+        external_ref=idea.external_ref,
+        created_at=idea.created_at,
     )
 
 

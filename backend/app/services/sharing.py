@@ -15,10 +15,11 @@ from sqlalchemy.orm import Session
 
 from app.core.config import get_settings
 from app.core.errors import NotFound
-from app.models import Photo, Stop, Trip, User
+from app.models import Idea, Photo, Stop, Trip, User
 from app.models.enums import TimePrecision, TripKind, Visibility
 from app.schemas.share import (
     SharedDay,
+    SharedIdea,
     SharedPhoto,
     SharedSegment,
     SharedStop,
@@ -189,6 +190,22 @@ def shared_trip(session: Session, trip: Trip) -> SharedTrip:
             )
         )
 
+    ideas = []
+    for idea in session.scalars(
+        select(Idea).where(Idea.trip_id == trip.id).order_by(Idea.created_at, Idea.id)
+    ):
+        coords = lat_lon(idea.location)
+        ideas.append(
+            SharedIdea(
+                name=idea.name,
+                lat=coords[0] if coords else None,
+                lon=coords[1] if coords else None,
+                category=idea.category,
+                custom_category=idea.custom_category,
+                notes=idea.notes,
+            )
+        )
+
     cover_id = trip.cover_photo_id if any(p.id == trip.cover_photo_id for p in photos) else None
     if cover_id is None and photos:
         cover_id = photos[0].id
@@ -202,4 +219,5 @@ def shared_trip(session: Session, trip: Trip) -> SharedTrip:
         stop_count=sum(len(d.stops) for d in days),
         photo_count=len(photos),
         days=days,
+        ideas=ideas,
     )

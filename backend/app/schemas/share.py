@@ -50,6 +50,15 @@ class SharedSegment(ApiModel):
     duration_min: int | None
 
 
+class SharedIdea(ApiModel):
+    name: str
+    lat: float | None
+    lon: float | None
+    category: StopCategory
+    custom_category: str | None
+    notes: str | None
+
+
 class SharedDay(ApiModel):
     day_number: int
     date: dt.date
@@ -70,3 +79,4 @@ class SharedTrip(ApiModel):
     stop_count: int
     photo_count: int
     days: list[SharedDay]
+    ideas: list[SharedIdea] = Field(description="Luoghi senza giorno: idee o cose non fatte")
