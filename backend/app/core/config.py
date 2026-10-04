@@ -27,6 +27,9 @@ class Settings(BaseSettings):
     nominatim_url: str = "https://nominatim.openstreetmap.org"
     geocoder_user_agent: str = "planner-selfhosted/0.1"
     geocoder_timeout_s: float = 8.0
+    # Lingua dei nomi restituiti (Pechino invece di 北京市). Photon pubblico ne supporta poche:
+    # se rifiuta questa si ripiega sull'inglese.
+    geocoder_language: str = "it"
 
     # URL pubblico usato per comporre i link di condivisione (vuoto = relativo).
     public_base_url: str = ""

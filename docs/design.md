@@ -33,6 +33,11 @@ o lo precisa.
   tappa in coda al giorno scelto, `POST /api/stops/{id}/to-idea` fa il contrario (orari e segmenti
   si perdono). Nella pagina condivisa diventano «Per la prossima volta» (ricostruzioni) o «Altre
   idee» (itinerari).
+- **Ricerca luoghi in due passi.** Photon serve la ricerca mentre si digita, con i nomi nella
+  lingua di `GEOCODER_LANGUAGE` (o in inglese se l'istanza non la supporta). Photon però può non
+  conoscere i nomi italiani di luoghi esteri (Pechino): la voce «Cerca ancora» manda una sola
+  ricerca a Nominatim (`?deep=true`), che cerca in tutte le lingue. È un'azione esplicita, quindi
+  rispetta la policy di Nominatim che vieta l'autocompletamento.
 - **Categoria Quartiere** (`neighborhood`) per zone girate a piedi più che singoli luoghi.
 - **Vista Foto** su `/trips/:id/photos`; la tappa selezionata non è nell'URL (`?stop=`), solo nel
   contesto della pagina.

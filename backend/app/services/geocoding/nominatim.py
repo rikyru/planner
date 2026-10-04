@@ -14,12 +14,15 @@ class NominatimProvider:
     name = "nominatim"
     _min_interval_s = 1.0
 
-    def __init__(self, base_url: str, user_agent: str, timeout: float) -> None:
+    def __init__(
+        self, base_url: str, user_agent: str, timeout: float, language: str = "en"
+    ) -> None:
         self._client = httpx.Client(
             base_url=base_url.rstrip("/"), headers={"User-Agent": user_agent}, timeout=timeout
         )
         self._lock = threading.Lock()
         self._last_call = 0.0
+        self._language = language
 
     def search(
         self, query: str, *, lat: float | None, lon: float | None, limit: int
@@ -29,6 +32,8 @@ class NominatimProvider:
             "format": "jsonv2",
             "limit": limit,
             "addressdetails": 0,
+            # Nominatim cerca in tutti i nomi (Pechino, Beijing, 北京) e restituisce questa lingua.
+            "accept-language": self._language,
         }
         if lat is not None and lon is not None:
             # Preferenza (non vincolo) per i risultati vicini al viaggio.

@@ -25,5 +25,7 @@ def search(
     lat: float | None = Query(default=None, ge=-90, le=90),
     lon: float | None = Query(default=None, ge=-180, le=180),
     limit: int = Query(default=6, ge=1, le=15),
+    # Ricerca esplicita ("Cerca ancora"): usa un provider più completo ma più lento.
+    deep: bool = False,
 ) -> list[PlaceOut]:
-    return [PlaceOut.model_validate(p) for p in service.search(q, lat, lon, limit)]
+    return [PlaceOut.model_validate(p) for p in service.search(q, lat, lon, limit, deep=deep)]

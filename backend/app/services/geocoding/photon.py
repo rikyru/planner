@@ -1,8 +1,13 @@
+import logging
 from typing import Any
 
 import httpx
 
 from app.services.geocoding.base import Place, category_from_osm, osm_ref
+
+logger = logging.getLogger(__name__)
+
+_FALLBACK_LANGUAGE = "en"
 
 
 class PhotonProvider:
@@ -10,18 +15,29 @@ class PhotonProvider:
 
     name = "photon"
 
-    def __init__(self, base_url: str, user_agent: str, timeout: float) -> None:
+    def __init__(
+        self, base_url: str, user_agent: str, timeout: float, language: str = "en"
+    ) -> None:
         self._client = httpx.Client(
             base_url=base_url.rstrip("/"), headers={"User-Agent": user_agent}, timeout=timeout
         )
+        # Senza lingua Photon restituisce i nomi locali (北京市, Москва).
+        self._language = language
 
     def search(
         self, query: str, *, lat: float | None, lon: float | None, limit: int
     ) -> list[Place]:
-        params: dict[str, Any] = {"q": query, "limit": limit}
+        params: dict[str, Any] = {"q": query, "limit": limit, "lang": self._language}
         if lat is not None and lon is not None:
             params.update(lat=lat, lon=lon)
         response = self._client.get("/api", params=params)
+        if response.status_code == 400 and self._language != _FALLBACK_LANGUAGE:
+            # Lingua non supportata da questa istanza: si passa all'inglese una volta per tutte.
+            logger.info(
+                "Photon non supporta la lingua %r: uso %r", self._language, _FALLBACK_LANGUAGE
+            )
+            self._language = _FALLBACK_LANGUAGE
+            return self.search(query, lat=lat, lon=lon, limit=limit)
         response.raise_for_status()
         return [p for f in response.json().get("features", []) if (p := _to_place(f))]
 
