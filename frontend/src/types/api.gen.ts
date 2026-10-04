@@ -204,6 +204,82 @@ export interface paths {
         patch: operations["update_segment_api_segments__segment_id__patch"];
         trace?: never;
     };
+    "/api/trips/{trip_id}/ideas": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** List Ideas */
+        get: operations["list_ideas_api_trips__trip_id__ideas_get"];
+        put?: never;
+        /** Create Idea */
+        post: operations["create_idea_api_trips__trip_id__ideas_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/ideas/{idea_id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post?: never;
+        /** Delete Idea */
+        delete: operations["delete_idea_api_ideas__idea_id__delete"];
+        options?: never;
+        head?: never;
+        /** Update Idea */
+        patch: operations["update_idea_api_ideas__idea_id__patch"];
+        trace?: never;
+    };
+    "/api/ideas/{idea_id}/schedule": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Schedule Idea
+         * @description Mette l'idea in un giorno come tappa; restituisce il giorno aggiornato.
+         */
+        post: operations["schedule_idea_api_ideas__idea_id__schedule_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/stops/{stop_id}/to-idea": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Stop To Idea
+         * @description Toglie la tappa dal giorno e la rimette tra le idee (orari e segmenti si perdono).
+         */
+        post: operations["stop_to_idea_api_stops__stop_id__to_idea_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/trips/{trip_id}/photos": {
         parameters: {
             query?: never;
@@ -428,6 +504,75 @@ export interface components {
             /** Detail */
             detail?: components["schemas"]["ValidationError"][];
         };
+        /** IdeaCreate */
+        IdeaCreate: {
+            /** Name */
+            name: string;
+            /** Lat */
+            lat?: number | null;
+            /** Lon */
+            lon?: number | null;
+            /** Address */
+            address?: string | null;
+            category?: components["schemas"]["StopCategory"] | null;
+            /** Custom Category */
+            custom_category?: string | null;
+            /** Notes */
+            notes?: string | null;
+            /** External Ref */
+            external_ref?: string | null;
+        };
+        /** IdeaOut */
+        IdeaOut: {
+            /**
+             * Id
+             * Format: uuid
+             */
+            id: string;
+            /**
+             * Trip Id
+             * Format: uuid
+             */
+            trip_id: string;
+            /** Name */
+            name: string;
+            /** Lat */
+            lat: number | null;
+            /** Lon */
+            lon: number | null;
+            /** Address */
+            address: string | null;
+            category: components["schemas"]["StopCategory"];
+            /** Custom Category */
+            custom_category: string | null;
+            /** Notes */
+            notes: string | null;
+            /** External Ref */
+            external_ref: string | null;
+            /**
+             * Created At
+             * Format: date-time
+             */
+            created_at: string;
+        };
+        /** IdeaUpdate */
+        IdeaUpdate: {
+            /** Name */
+            name?: string | null;
+            /** Lat */
+            lat?: number | null;
+            /** Lon */
+            lon?: number | null;
+            /** Address */
+            address?: string | null;
+            category?: components["schemas"]["StopCategory"] | null;
+            /** Custom Category */
+            custom_category?: string | null;
+            /** Notes */
+            notes?: string | null;
+            /** External Ref */
+            external_ref?: string | null;
+        };
         /** MoveStop */
         MoveStop: {
             /**
@@ -543,6 +688,19 @@ export interface components {
             /** Stop Ids */
             stop_ids: string[];
         };
+        /**
+         * ScheduleIdea
+         * @description Trasforma l'idea in una tappa del giorno indicato (in coda se manca la posizione).
+         */
+        ScheduleIdea: {
+            /**
+             * Day Id
+             * Format: uuid
+             */
+            day_id: string;
+            /** Position */
+            position?: number | null;
+        };
         /** SegmentOut */
         SegmentOut: {
             /**
@@ -627,6 +785,20 @@ export interface components {
             segments: components["schemas"]["SharedSegment"][];
             /** Photos */
             photos: components["schemas"]["SharedPhoto"][];
+        };
+        /** SharedIdea */
+        SharedIdea: {
+            /** Name */
+            name: string;
+            /** Lat */
+            lat: number | null;
+            /** Lon */
+            lon: number | null;
+            category: components["schemas"]["StopCategory"];
+            /** Custom Category */
+            custom_category: string | null;
+            /** Notes */
+            notes: string | null;
         };
         /** SharedPhoto */
         SharedPhoto: {
@@ -721,12 +893,17 @@ export interface components {
             photo_count: number;
             /** Days */
             days: components["schemas"]["SharedDay"][];
+            /**
+             * Ideas
+             * @description Luoghi senza giorno: idee o cose non fatte
+             */
+            ideas: components["schemas"]["SharedIdea"][];
         };
         /**
          * StopCategory
          * @enum {string}
          */
-        StopCategory: "attraction" | "food" | "hotel" | "transport" | "parking" | "nature" | "shopping" | "nightlife" | "custom";
+        StopCategory: "attraction" | "food" | "hotel" | "transport" | "parking" | "nature" | "shopping" | "nightlife" | "neighborhood" | "custom";
         /** StopCreate */
         StopCreate: {
             /** Name */
@@ -814,6 +991,11 @@ export interface components {
              * Format: date-time
              */
             updated_at: string;
+        };
+        /** StopToIdeaResult */
+        StopToIdeaResult: {
+            day: components["schemas"]["DayOut"];
+            idea: components["schemas"]["IdeaOut"];
         };
         /** StopUpdate */
         StopUpdate: {
@@ -1490,6 +1672,202 @@ export interface operations {
                 };
                 content: {
                     "application/json": components["schemas"]["SegmentOut"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    list_ideas_api_trips__trip_id__ideas_get: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                trip_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["IdeaOut"][];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    create_idea_api_trips__trip_id__ideas_post: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                trip_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["IdeaCreate"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["IdeaOut"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    delete_idea_api_ideas__idea_id__delete: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                idea_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            204: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    update_idea_api_ideas__idea_id__patch: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                idea_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["IdeaUpdate"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["IdeaOut"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    schedule_idea_api_ideas__idea_id__schedule_post: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                idea_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["ScheduleIdea"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["DayOut"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    stop_to_idea_api_stops__stop_id__to_idea_post: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                stop_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["StopToIdeaResult"];
                 };
             };
             /** @description Validation Error */

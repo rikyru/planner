@@ -2,6 +2,7 @@ import { Trash } from 'lucide-react'
 import { useState, type FormEvent } from 'react'
 import { toast } from 'sonner'
 
+import { useStopToIdea } from '@/api/ideas'
 import { useTripPhotos } from '@/api/photos'
 import { useCreateStop, useDeleteStop, useMoveStop, useUpdateStop } from '@/api/stops'
 import { Button } from '@/components/ui/button'
@@ -85,6 +86,8 @@ function toNumber(value: string): number | null {
   return value.trim() === '' || Number.isNaN(n) ? null : n
 }
 
+const IDEAS = 'ideas'
+
 function StopForm({ trip, day, stop, onOpenChange }: Props) {
   const [form, setForm] = useState<FormState>(() => initialState(stop))
   const [side, setSide] = useState<Side>(primarySide(trip.kind))
@@ -92,6 +95,7 @@ function StopForm({ trip, day, stop, onOpenChange }: Props) {
   const update = useUpdateStop(trip.id)
   const remove = useDeleteStop(trip.id)
   const move = useMoveStop(trip.id)
+  const toIdea = useStopToIdea(trip.id)
 
   const lat = toNumber(form.lat)
   const lon = toNumber(form.lon)
@@ -239,30 +243,35 @@ function StopForm({ trip, day, stop, onOpenChange }: Props) {
 
         {stop && <StopPhotos tripId={trip.id} stopId={stop.id} />}
 
-        {stop && trip.days.length > 1 && (
+        {stop && (
           <div className="space-y-2">
-            <Label htmlFor="stop-move">Sposta in un altro giorno</Label>
+            <Label htmlFor="stop-move">Sposta</Label>
             <NativeSelect
               id="stop-move"
               value={day.id}
-              onChange={(e) =>
-                move.mutate(
-                  { stopId: stop.id, dayId: e.target.value },
-                  {
-                    onSuccess: () => {
-                      toast.success('Tappa spostata')
-                      onOpenChange(false)
-                    },
-                    onError: (err) => toast.error(err.message),
+              disabled={move.isPending || toIdea.isPending}
+              onChange={(e) => {
+                const done = (message: string) => ({
+                  onSuccess: () => {
+                    toast.success(message)
+                    onOpenChange(false)
                   },
-                )
-              }
+                  onError: (err: Error) => toast.error(err.message),
+                })
+                if (e.target.value !== IDEAS) {
+                  move.mutate({ stopId: stop.id, dayId: e.target.value }, done('Tappa spostata'))
+                  return
+                }
+                if (!window.confirm(`Rimettere “${stop.name}” tra le idee? Orari e spostamenti della tappa si perdono.`)) return
+                toIdea.mutate(stop.id, done('Tappa rimessa tra le idee'))
+              }}
             >
               {trip.days.map((d) => (
                 <option key={d.id} value={d.id}>
                   Giorno {d.day_number} · {d.title || formatDayLong(d.date)}
                 </option>
               ))}
+              <option value={IDEAS}>Tra le idee, senza giorno</option>
             </NativeSelect>
           </div>
         )}

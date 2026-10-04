@@ -12,6 +12,7 @@ import {
   Plane,
   Ship,
   ShoppingBag,
+  Signpost,
   BedDouble,
   TrainFront,
   TramFront,
@@ -32,6 +33,7 @@ export const CATEGORIES: Record<StopCategory, { label: string; icon: LucideIcon;
   nature: { label: 'Natura', icon: Trees, color: '#4f7f4f' },
   shopping: { label: 'Shopping', icon: ShoppingBag, color: '#b5577a' },
   nightlife: { label: 'Vita notturna', icon: Moon, color: '#3d3b6e' },
+  neighborhood: { label: 'Quartiere', icon: Signpost, color: '#8a6d3b' },
   custom: { label: 'Altro', icon: MapPin, color: '#7a6a58' },
 }
 

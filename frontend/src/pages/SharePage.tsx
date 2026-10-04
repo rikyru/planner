@@ -9,7 +9,7 @@ import { DAY_COLORS, type MapPoint } from '@/features/map/mapData'
 import { TripMap } from '@/features/map/TripMap'
 import { TripCover } from '@/features/trips/TripCover'
 import { cn } from '@/lib/utils'
-import type { SharedDay, SharedPhoto, SharedStop, SharedTrip } from '@/types'
+import type { SharedDay, SharedIdea, SharedPhoto, SharedStop, SharedTrip } from '@/types'
 import { formatDateRange, formatDayLong, formatDuration, formatTime } from '@/utils/dates'
 import { CATEGORIES, PRECISION, TRANSPORT } from '@/utils/labels'
 
@@ -140,6 +140,8 @@ function Journal({ trip }: { trip: SharedTrip }) {
           <DayChapter key={day.day_number} day={day} onOpenPhoto={openPhoto} />
         ))}
 
+        {trip.ideas.length > 0 && <IdeasChapter trip={trip} />}
+
         <footer className="border-t py-10 text-center text-sm text-muted-foreground">
           {formatDateRange(trip.start_date, trip.end_date)} · creato con Planner
         </footer>
@@ -250,6 +252,49 @@ function DayChapter({ day, onOpenPhoto }: { day: SharedDay; onOpenPhoto: (photo:
         </div>
       )}
     </section>
+  )
+}
+
+/** Nei diari i posti non visti, negli itinerari quelli ancora senza giorno. */
+function IdeasChapter({ trip }: { trip: SharedTrip }) {
+  const reconstruct = trip.kind === 'reconstruct'
+  return (
+    <section id="idee" className="scroll-mt-16 pt-16 pb-12 sm:pt-20">
+      <p className="text-xs font-semibold tracking-[0.2em] text-muted-foreground uppercase">
+        {reconstruct ? 'Rimasti in lista' : 'Senza un giorno'}
+      </p>
+      <h2 className="mt-1 font-serif text-3xl font-semibold tracking-tight sm:text-4xl">
+        {reconstruct ? 'Per la prossima volta' : 'Altre idee'}
+      </h2>
+      <ul className="mt-6 grid gap-3 sm:grid-cols-2">
+        {trip.ideas.map((idea, index) => (
+          <IdeaItem key={index} idea={idea} />
+        ))}
+      </ul>
+    </section>
+  )
+}
+
+function IdeaItem({ idea }: { idea: SharedIdea }) {
+  const category = CATEGORIES[idea.category]
+  const Icon = category.icon
+  return (
+    <li className="flex gap-3 rounded-xl border p-4">
+      <span
+        className="flex size-8 shrink-0 items-center justify-center rounded-full text-white"
+        style={{ backgroundColor: category.color }}
+        aria-hidden
+      >
+        <Icon className="size-4" />
+      </span>
+      <div className="min-w-0">
+        <h3 className="font-serif text-lg leading-snug font-semibold">{idea.name}</h3>
+        <p className="text-sm text-muted-foreground">
+          {idea.category === 'custom' && idea.custom_category ? idea.custom_category : category.label}
+        </p>
+        {idea.notes && <p className="mt-1.5 text-sm leading-relaxed text-pretty">{idea.notes}</p>}
+      </div>
+    </li>
   )
 }
 

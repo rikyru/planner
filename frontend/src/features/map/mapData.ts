@@ -1,4 +1,4 @@
-import type { Day, Segment, Stop } from '@/types'
+import type { Day, Idea, Segment, Stop } from '@/types'
 import { CATEGORIES, TRANSPORT } from '@/utils/labels'
 
 export interface MapPoint {
@@ -29,6 +29,26 @@ export function dayPoints(day: Day): MapPoint[] {
       : [],
   )
 }
+
+export function ideaPoints(ideas: Idea[]): MapPoint[] {
+  return ideas.flatMap((idea) =>
+    idea.lat != null && idea.lon != null
+      ? [
+          {
+            id: idea.id,
+            lat: idea.lat,
+            lon: idea.lon,
+            label: '★',
+            title: idea.name,
+            subtitle: idea.category === 'custom' && idea.custom_category ? idea.custom_category : CATEGORIES[idea.category].label,
+            color: CATEGORIES[idea.category].color,
+          },
+        ]
+      : [],
+  )
+}
+
+export const EMPTY_LINES: GeoJSON.FeatureCollection<GeoJSON.LineString> = { type: 'FeatureCollection', features: [] }
 
 export const DAY_COLORS = ['#2f6577', '#c8643b', '#6b5b95', '#4f7f4f', '#b5577a', '#4a6fa5', '#b07d2b', '#3d3b6e']
 

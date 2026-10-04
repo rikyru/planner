@@ -28,3 +28,8 @@ export type SharedTrip = Schemas['SharedTrip']
 export type SharedDay = Schemas['SharedDay']
 export type SharedStop = Schemas['SharedStop']
 export type SharedPhoto = Schemas['SharedPhoto']
+
+export type Idea = Schemas['IdeaOut']
+export type IdeaCreate = Schemas['IdeaCreate']
+export type IdeaUpdate = Schemas['IdeaUpdate']
+export type SharedIdea = Schemas['SharedIdea']

@@ -27,6 +27,13 @@ o lo precisa.
   ricrea dall'originale alla prima richiesta.
 - **Spostare una tappa sposta le sue foto** nel nuovo giorno (`photos.day_id` segue `stop.day_id`).
 - **`GET /api/trips/{id}/share`** restituisce lo stato della condivisione per il dialog.
+- **Idee senza giorno** (aggiunta dopo il test con un viaggio reale). Tabella `ideas` separata
+  dalle tappe, perché una tappa appartiene sempre a un giorno e ha orari e segmenti. Vista Idee su
+  `/trips/:id/ideas` con i marker sulla mappa; `POST /api/ideas/{id}/schedule` la trasforma in
+  tappa in coda al giorno scelto, `POST /api/stops/{id}/to-idea` fa il contrario (orari e segmenti
+  si perdono). Nella pagina condivisa diventano «Per la prossima volta» (ricostruzioni) o «Altre
+  idee» (itinerari).
+- **Categoria Quartiere** (`neighborhood`) per zone girate a piedi più che singoli luoghi.
 - **Vista Foto** su `/trips/:id/photos`; la tappa selezionata non è nell'URL (`?stop=`), solo nel
   contesto della pagina.
 

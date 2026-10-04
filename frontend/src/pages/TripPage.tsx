@@ -2,10 +2,12 @@ import { ArrowLeft, List, Map as MapIcon, Pencil, Share2 } from 'lucide-react'
 import { useMemo, useState } from 'react'
 import { Link, Navigate, useParams } from 'react-router'
 
+import { useTripIdeas } from '@/api/ideas'
 import { useTrip } from '@/api/trips'
 import { Button } from '@/components/ui/button'
 import { DayList } from '@/features/days/DayList'
-import { dayLines, dayPoints, overviewLines, overviewPoints } from '@/features/map/mapData'
+import { IdeasView } from '@/features/ideas/IdeasView'
+import { EMPTY_LINES, dayLines, dayPoints, ideaPoints, overviewLines, overviewPoints } from '@/features/map/mapData'
 import { TripMap } from '@/features/map/TripMap'
 import { PhotosView } from '@/features/photos/PhotosView'
 import { ShareDialog } from '@/features/share/ShareDialog'
@@ -18,7 +20,9 @@ import { cn } from '@/lib/utils'
 import type { Day, TripDetail } from '@/types'
 import { formatDateRange } from '@/utils/dates'
 
-export function TripPage({ view }: { view?: 'photos' }) {
+export type TripPageView = 'photos' | 'ideas'
+
+export function TripPage({ view }: { view?: TripPageView }) {
   const { tripId, dayNumber } = useParams()
   const trip = useTrip(tripId)
 
@@ -44,7 +48,7 @@ export function TripPage({ view }: { view?: 'photos' }) {
   )
 }
 
-function TripLayout({ trip, day, view }: { trip: TripDetail; day: Day | null; view?: 'photos' }) {
+function TripLayout({ trip, day, view }: { trip: TripDetail; day: Day | null; view?: TripPageView }) {
   const desktop = useMediaQuery('(min-width: 1024px)')
   const [mobileTab, setMobileTab] = useState<'timeline' | 'map'>('timeline')
   const [editing, setEditing] = useState(false)
@@ -53,6 +57,8 @@ function TripLayout({ trip, day, view }: { trip: TripDetail; day: Day | null; vi
   const content =
     view === 'photos' ? (
       <PhotosView trip={trip} />
+    ) : view === 'ideas' ? (
+      <IdeasView trip={trip} />
     ) : day ? (
       <Timeline key={day.id} trip={trip} day={day} />
     ) : (
@@ -86,7 +92,7 @@ function TripLayout({ trip, day, view }: { trip: TripDetail; day: Day | null; vi
           </aside>
           <main className="overflow-y-auto px-6 py-6">{content}</main>
           <section className="border-l">
-            <TripMapPanel trip={trip} day={day} />
+            <TripMapPanel trip={trip} day={day} view={view} />
           </section>
         </div>
       ) : (
@@ -98,7 +104,7 @@ function TripLayout({ trip, day, view }: { trip: TripDetail; day: Day | null; vi
             {content}
           </div>
           <div className={cn('min-h-0 flex-1', mobileTab !== 'map' && 'hidden')}>
-            {mobileTab === 'map' && <TripMapPanel trip={trip} day={day} />}
+            {mobileTab === 'map' && <TripMapPanel trip={trip} day={day} view={view} />}
           </div>
           <nav className="fixed inset-x-0 bottom-0 z-30 flex justify-center pb-[max(env(safe-area-inset-bottom),12px)]">
             <div className="flex rounded-full border bg-background/95 p-1 shadow-lg backdrop-blur">
@@ -132,16 +138,25 @@ function MobileTab({ active, onClick, icon, label }: { active: boolean; onClick:
   )
 }
 
-function TripMapPanel({ trip, day }: { trip: TripDetail; day: Day | null }) {
+function TripMapPanel({ trip, day, view }: { trip: TripDetail; day: Day | null; view?: TripPageView }) {
   const { selectedStopId, setSelectedStopId, hoveredStopId, setHoveredStopId } = useTripView()
-  const points = useMemo(() => (day ? dayPoints(day) : overviewPoints(trip.days)), [trip.days, day])
-  const lines = useMemo(() => (day ? dayLines(day) : overviewLines(trip.days)), [trip.days, day])
+  const showIdeas = view === 'ideas'
+  const ideas = useTripIdeas(trip.id, showIdeas)
+  const points = useMemo(
+    () => (showIdeas ? ideaPoints(ideas.data ?? []) : day ? dayPoints(day) : overviewPoints(trip.days)),
+    [showIdeas, ideas.data, trip.days, day],
+  )
+  const lines = useMemo(
+    () => (showIdeas ? EMPTY_LINES : day ? dayLines(day) : overviewLines(trip.days)),
+    [showIdeas, trip.days, day],
+  )
   return (
     <TripMap
       points={points}
       lines={lines}
-      fitKey={day?.id ?? 'overview'}
-      compact={!day}
+      // Le idee arrivano dopo il viaggio: si ricentra quando sono caricate.
+      fitKey={showIdeas ? `ideas-${ideas.isSuccess}` : (day?.id ?? 'overview')}
+      compact={!day && !showIdeas}
       selectedId={selectedStopId}
       hoveredId={hoveredStopId}
       onSelect={setSelectedStopId}

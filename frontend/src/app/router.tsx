@@ -16,6 +16,10 @@ export const router = createBrowserRouter([
     path: '/trips/:tripId/photos',
     lazy: () => import('@/pages/TripPage').then((m) => ({ Component: () => <m.TripPage view="photos" /> })),
   },
+  {
+    path: '/trips/:tripId/ideas',
+    lazy: () => import('@/pages/TripPage').then((m) => ({ Component: () => <m.TripPage view="ideas" /> })),
+  },
   { path: '/share/:token', lazy: () => import('@/pages/SharePage').then((m) => ({ Component: m.SharePage })) },
   { path: '*', element: <NotFoundPage /> },
 ])

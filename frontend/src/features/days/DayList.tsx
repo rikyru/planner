@@ -1,6 +1,7 @@
 import { useEffect, useRef } from 'react'
 import { NavLink } from 'react-router'
 
+import { useTripIdeas } from '@/api/ideas'
 import { cn } from '@/lib/utils'
 import type { TripDetail } from '@/types'
 import { formatDayShort } from '@/utils/dates'
@@ -9,6 +10,7 @@ import { formatDayShort } from '@/utils/dates'
 export function DayList({ trip, orientation }: { trip: TripDetail; orientation: 'vertical' | 'horizontal' }) {
   const vertical = orientation === 'vertical'
   const navRef = useRef<HTMLElement>(null)
+  const ideas = useTripIdeas(trip.id)
   // Su smartphone la giornata attiva resta visibile nella barra orizzontale.
   useEffect(() => {
     navRef.current?.querySelector('[aria-current="page"]')?.scrollIntoView({ inline: 'center', block: 'nearest' })
@@ -40,6 +42,19 @@ export function DayList({ trip, orientation }: { trip: TripDetail; orientation: 
       >
         Foto
         {trip.photo_count > 0 && <span className="text-xs opacity-70 tabular-nums">{trip.photo_count}</span>}
+      </NavLink>
+      <NavLink
+        to={`/trips/${trip.id}/ideas`}
+        className={({ isActive }) =>
+          cn(
+            'flex shrink-0 items-center justify-between gap-2 rounded-lg text-sm font-medium transition-colors',
+            vertical ? 'px-3 py-2' : 'border px-3 py-1.5',
+            isActive ? 'bg-primary text-primary-foreground' : 'hover:bg-muted',
+          )
+        }
+      >
+        Idee
+        {!!ideas.data?.length && <span className="text-xs opacity-70 tabular-nums">{ideas.data.length}</span>}
       </NavLink>
       {trip.days.map((day) => {
         const { weekday, date } = formatDayShort(day.date)
